@@ -1,0 +1,100 @@
+{
+	"info": {
+		"_postman_id": "staffkhata-api-collection",
+		"name": "Staff Khata API",
+		"description": "API Collection for Staff Khata Gym Management SaaS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Admin User\",\n    \"email\": \"admin@example.com\",\n    \"password\": \"password123\",\n    \"role\": \"Administrator\",\n    \"gym_id\": \"test_gym_01\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] }
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"password123\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+					}
+				},
+				{
+					"name": "Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/auth/profile", "host": ["{{base_url}}"], "path": ["auth", "profile"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Admin Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "X-Gym-ID", "value": "{{gym_id}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/dashboard/admin/stats", "host": ["{{base_url}}"], "path": ["dashboard", "admin", "stats"] }
+					}
+				},
+				{
+					"name": "Revenue Chart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "X-Gym-ID", "value": "{{gym_id}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/dashboard/revenue-chart", "host": ["{{base_url}}"], "path": ["dashboard", "revenue-chart"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Members",
+			"item": [
+				{
+					"name": "List Members",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "X-Gym-ID", "value": "{{gym_id}}", "type": "text" }
+						],
+						"url": { "raw": "{{base_url}}/members", "host": ["{{base_url}}"], "path": ["members"] }
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{ "key": "token", "value": "{{jwt_token}}", "type": "string" }
+		]
+	},
+	"variable": [
+		{ "key": "base_url", "value": "http://localhost:8000/api", "type": "string" },
+		{ "key": "gym_id", "value": "test_gym_01", "type": "string" },
+		{ "key": "jwt_token", "value": "your_token_here", "type": "string" }
+	]
+}

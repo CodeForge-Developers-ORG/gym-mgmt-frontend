@@ -1,26 +1,307 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Premium dark slate + violet accent palette */
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 24 98% 53%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 24 10% 90%;
+  --secondary-foreground: 24 50% 10%;
+  --muted: 24 10% 95%;
+  --muted-foreground: 24 5% 45%;
+  --accent: 24 10% 90%;
+  --accent-foreground: 24 50% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 24 10% 90%;
+  --input: 24 10% 90%;
+  --ring: 24 98% 53%;
+  --radius: 0.625rem;
+  --success: 142.1 76.2% 36.3%;
+  --success-foreground: 355.7 100% 97.3%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 48 96% 89%;
+  --info: 221.2 83.2% 53.3%;
+  --info-foreground: 210 40% 98%;
+  --chart-1: 262 83% 58%;
+  --chart-2: 199 89% 48%;
+  --chart-3: 142 76% 36%;
+  --chart-4: 38 92% 50%;
+  --chart-5: 0 84% 60%;
+  --sidebar-bg: 240 6% 10%;
+  --sidebar-foreground: 220 9% 75%;
+  --sidebar-primary: 262 83% 63%;
+  --sidebar-accent: 240 5% 16%;
+  --sidebar-border: 240 4% 16%;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --background: 222 47% 6%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 8%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 8%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 24 98% 53%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 24 10% 15%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 24 10% 15%;
+  --muted-foreground: 24 10% 65%;
+  --accent: 24 10% 15%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 24 10% 15%;
+  --input: 24 10% 15%;
+  --ring: 24 98% 53%;
+  --success: 142.1 70.6% 25.3%;
+  --success-foreground: 144.9 80.4% 10%;
+  --warning: 38 92% 38%;
+  --warning-foreground: 48 96% 89%;
+  --info: 217.2 32.6% 17.5%;
+  --info-foreground: 210 40% 98%;
+  --chart-1: 262 83% 63%;
+  --chart-2: 199 89% 48%;
+  --chart-3: 142 76% 36%;
+  --chart-4: 38 92% 50%;
+  --chart-5: 0 84% 60%;
+  --sidebar-bg: 222 47% 5%;
+  --sidebar-foreground: 215 20% 65%;
+  --sidebar-primary: 262 83% 63%;
+  --sidebar-accent: 217 33% 12%;
+  --sidebar-border: 217 33% 12%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-[hsl(var(--border))];
+  }
+
+  body {
+    @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))];
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  }
+
+  .dark .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(35, 98%, 50%) 100%);
+  }
+
+  .gradient-card {
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--secondary)) 100%);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+
+  .animate-pulse-soft {
+    animation: pulseSoft 2s ease-in-out infinite;
+  }
+
+  .animate-depth-in {
+    animation: depthIn 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  .animate-marquee {
+    animation: marquee 12s linear infinite;
+  }
+
+  .perspective-distant {
+    perspective: 2000px;
+  }
 }
+
+@keyframes depthIn {
+  from {
+    transform: translateZ(1000px);
+    opacity: 0;
+    visibility: hidden;
+  }
+  to {
+    transform: translateZ(0);
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@keyframes marquee {
+  from { transform: translateX(100%); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Dialog animations */
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes overlayOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes dialogOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.95);
+  }
+}
+
+.animate-overlay-in {
+  animation: overlayIn 0.2s ease-out forwards;
+}
+
+.animate-overlay-out {
+  animation: overlayOut 0.15s ease-in forwards;
+}
+
+.animate-dialog-in {
+  animation: dialogIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-dialog-out {
+  animation: dialogOut 0.15s ease-in forwards;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Calendar customization */
+.rbc-calendar {
+  font-family: "Inter", system-ui, sans-serif !important;
+}
+
+.rbc-toolbar button {
+  @apply rounded-lg px-3 py-1.5 text-sm font-medium transition-colors;
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.rbc-toolbar button:hover {
+  background: hsl(var(--accent));
+}
+
+.rbc-toolbar button.rbc-active {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+
+.rbc-header {
+  @apply py-2 text-sm font-semibold;
+  color: hsl(var(--muted-foreground));
+  border-bottom: 1px solid hsl(var(--border)) !important;
+}
+
+.rbc-off-range-bg {
+  background: hsl(var(--muted) / 0.5) !important;
+}
+
+.rbc-today {
+  background: hsl(var(--primary) / 0.1) !important;
+}
+
+.rbc-event {
+  @apply rounded-md text-xs px-2 py-1;
+  background: hsl(var(--primary)) !important;
+  border: none !important;
+}
+
+.rbc-day-bg + .rbc-day-bg,
+.rbc-month-row + .rbc-month-row {
+  border-color: hsl(var(--border)) !important;
+}
+
+.rbc-month-view {
+  border-color: hsl(var(--border)) !important;
+}
+
+
