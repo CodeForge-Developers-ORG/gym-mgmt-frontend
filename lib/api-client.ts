@@ -1,6 +1,6 @@
 "use client"
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.gym.staffkhata.com/api";
 
 interface RequestOptions extends RequestInit {
   gymId?: string;

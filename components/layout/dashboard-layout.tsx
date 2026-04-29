@@ -26,7 +26,7 @@ export function DashboardLayout({ children, navItems, roleName }: DashboardLayou
       if (pathname.includes("/super-admin")) {
         router.push("/super-admin-login")
       } else {
-        router.push("/login")
+        router.push("/")
       }
       return
     }

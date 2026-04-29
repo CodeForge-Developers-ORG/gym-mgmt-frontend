@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { RoleSwitcher } from "@/components/layout/role-switcher"
 import { api } from "@/lib/api-client"
 
 import Image from "next/image"
@@ -28,7 +27,7 @@ export default function LoginPage() {
 
     try {
       const data = await api.post("/auth/login", { email, password })
-      
+
       // Reject Super Admin on this page
       if (data.user.role === "SUPER_ADMIN" || data.user.role === "SuperAdmin") {
         setError("Super Admin access is restricted on this page.")
@@ -38,7 +37,7 @@ export default function LoginPage() {
       // Store session
       localStorage.setItem("token", data.access_token)
       localStorage.setItem("user", JSON.stringify(data.user))
-      
+
       // Redirect based on role
       const role = data.user.role.toLowerCase()
       router.push(`/${role}`)
@@ -53,10 +52,10 @@ export default function LoginPage() {
     <div className="mx-auto w-full max-w-sm space-y-8 animate-fade-in">
       <div className="flex flex-col space-y-4 text-center items-center">
         <div className="relative w-full h-20">
-          <Image 
-            src="/logo/logo.png" 
-            alt="Staff Khata Logo" 
-            fill 
+          <Image
+            src="/logo/logo.png"
+            alt="Staff Khata Logo"
+            fill
             className="object-contain"
             priority
           />

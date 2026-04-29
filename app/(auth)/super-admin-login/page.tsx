@@ -121,7 +121,7 @@ export default function SuperAdminLoginPage() {
 
       <div className="text-center">
         <Link
-          href="/login"
+          href="/"
           className="text-sm text-muted-foreground hover:text-primary transition-colors"
         >
           ← Return to member login
