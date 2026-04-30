@@ -27,12 +27,14 @@ interface DataTableProps<T> {
   data: T[];
   columns: Column<T>[];
   searchPlaceholder?: string;
+  isLoading?: boolean;
 }
 
-export function DataTable<T extends { id: string | number }>({
+export function DataTable<T extends { id?: string | number; _id?: string | number }>({
   data,
   columns,
-  searchPlaceholder = "Search..."
+  searchPlaceholder = "Search...",
+  isLoading = false
 }: DataTableProps<T>) {
   return (
     <div className="w-full space-y-4">
@@ -93,19 +95,38 @@ export function DataTable<T extends { id: string | number }>({
               </tr>
             </thead>
             <tbody className="divide-y">
-              {data.map((row) => (
-                <tr key={row.id} className="hover:bg-muted/50 transition-colors">
-                  {columns.map((col, i) => (
-                    <td key={i} className="p-4 align-middle">
-                      {col.cell 
-                        ? col.cell(row) 
-                        : col.accessorKey 
-                          ? String(row[col.accessorKey]) 
-                          : null}
-                    </td>
-                  ))}
+              {isLoading ? (
+                // Loading Skeletons
+                Array.from({ length: 5 }).map((_, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {columns.map((_, colIndex) => (
+                      <td key={colIndex} className="p-4">
+                        <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : data.length > 0 ? (
+                data.map((row) => (
+                  <tr key={row.id || (row as any)._id} className="hover:bg-muted/50 transition-colors">
+                    {columns.map((col, i) => (
+                      <td key={i} className="p-4 align-middle">
+                        {col.cell 
+                          ? col.cell(row) 
+                          : col.accessorKey 
+                            ? String(row[col.accessorKey]) 
+                            : null}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={columns.length} className="p-10 text-center text-muted-foreground">
+                    No results found.
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -113,7 +134,7 @@ export function DataTable<T extends { id: string | number }>({
 
       <div className="flex items-center justify-between px-2">
         <div className="text-sm text-muted-foreground">
-          Showing 1 to {data.length} of {data.length} entries
+          {isLoading ? "Loading..." : `Showing 1 to ${data.length} of ${data.length} entries`}
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm" disabled>
