@@ -27,7 +27,7 @@ export function Breadcrumbs() {
   if (crumbs.length <= 1) return null
 
   return (
-    <nav aria-label="Breadcrumb" className="mb-4">
+    <nav aria-label="Breadcrumb" className="mb-4 hidden sm:block">
       <ol className="flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
         {/* Home icon for the role root */}
         <li>

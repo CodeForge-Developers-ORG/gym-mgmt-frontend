@@ -11,13 +11,13 @@ import {
 } from "@/components/ui/widget";
 import { Badge } from "@/components/ui/badge";
 
-export function FitnessScoreWidget() {
+export function FitnessScoreWidget({ data }: { data?: any }) {
   return (
     <Widget design="mumbai" className="animate-depth-in">
       <WidgetHeader>
         <WidgetTitle className="text-muted-foreground flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest">
           <div className="bg-success size-1.5 rounded-full animate-pulse" />
-          Live Pulse
+          Branch Pulse
         </WidgetTitle>
       </WidgetHeader>
       <WidgetContent className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
@@ -25,13 +25,13 @@ export function FitnessScoreWidget() {
           <div className="relative w-8 h-8">
             <Image
               src="/vector_icons/health/3d Health(8).png"
-              alt="Burn"
+              alt="Revenue"
               fill
               className="object-contain"
             />
           </div>
-          <span className="text-lg font-bold">420</span>
-          <span className="text-[8px] uppercase text-muted-foreground font-semibold">Kcal</span>
+          <span className="text-lg font-bold">{data?.revenue || "0"}</span>
+          <span className="text-[8px] uppercase text-muted-foreground font-semibold">Total Revenue</span>
         </div>
         
         <div className="h-6 w-[1px] bg-border" />
@@ -40,27 +40,27 @@ export function FitnessScoreWidget() {
           <div className="relative w-8 h-8">
             <Image
               src="/vector_icons/health/3d Health(28).png"
-              alt="Steps"
+              alt="Members"
               fill
               className="object-contain"
             />
           </div>
-          <span className="text-lg font-bold">8.4k</span>
-          <span className="text-[8px] uppercase text-muted-foreground font-semibold">Steps</span>
+          <span className="text-lg font-bold">{data?.members || "0"}</span>
+          <span className="text-[8px] uppercase text-muted-foreground font-semibold">Members</span>
         </div>
       </WidgetContent>
       <WidgetFooter className="justify-center border-t pt-1.5 mt-1.5">
-        <span className="text-[9px] font-semibold text-primary uppercase tracking-tighter">Goal: 85% Achieved</span>
+        <span className="text-[9px] font-semibold text-primary uppercase tracking-tighter">Live Status: Operational</span>
       </WidgetFooter>
     </Widget>
   );
 }
 
-export function TrainerTaskWidget() {
-  const [tasks, setTasks] = React.useState([
-    { id: 1, title: "Client Assessment", done: true },
-    { id: 2, title: "Meal Plan Review", done: false },
-    { id: 3, title: "Equipment Check", done: false },
+export function TrainerTaskWidget({ tasks: initialTasks }: { tasks?: any[] }) {
+  const [tasks, setTasks] = React.useState(initialTasks || [
+    { id: 1, title: "Equipment Check", done: true },
+    { id: 2, title: "Class Scheduling", done: false },
+    { id: 3, title: "Member Follow-up", done: false },
   ]);
 
   const toggle = (id: number) => {
@@ -70,7 +70,7 @@ export function TrainerTaskWidget() {
   return (
     <Widget size="md" design="mumbai" className="animate-depth-in" style={{ animationDelay: '0.2s' }}>
       <WidgetHeader>
-        <WidgetTitle className="text-xs font-bold uppercase tracking-tight">Trainer Tasks</WidgetTitle>
+        <WidgetTitle className="text-xs font-bold uppercase tracking-tight">Daily Tasks</WidgetTitle>
         <Badge variant="outline" className="text-[9px] h-4 px-1">{tasks.filter(t => !t.done).length} Pending</Badge>
       </WidgetHeader>
       <WidgetContent className="justify-start items-start pt-1.5">
@@ -168,45 +168,23 @@ export function AnalogClockWidget() {
   );
 }
 
-export function RevenueGrowthWidget() {
-  return (
-    <Widget design="mumbai" className="animate-depth-in" style={{ animationDelay: '0.5s' }}>
-      <WidgetHeader>
-        <WidgetTitle className="flex w-full items-center justify-between">
-          <span className="text-xl font-bold tracking-tight">$42.8k</span>
-          <div className="size-5 bg-success/20 text-success rounded-full flex items-center justify-center">
-             <div className="border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[5px] border-b-success" />
-          </div>
-        </WidgetTitle>
-      </WidgetHeader>
-      <WidgetContent className="justify-between items-end pb-1">
-        <span className="text-success font-bold text-[10px]">+$2.4k</span>
-        <span className="text-success font-bold text-[10px]">+12.5%</span>
-      </WidgetContent>
-      <WidgetFooter className="flex-col items-start border-t pt-1.5 mt-1.5">
-        <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/60">Monthly Revenue</span>
-        <span className="text-[7px] text-muted-foreground/40 font-medium tracking-tight">Staff Khata Branch #1</span>
-      </WidgetFooter>
-    </Widget>
-  );
-}
-
-export function ClassDistributionWidget() {
-  const data = [
-    { name: "Strength", value: 45, color: "bg-orange-500" },
-    { name: "Yoga", value: 25, color: "bg-amber-400" },
-    { name: "Cardio", value: 20, color: "bg-orange-300" },
-    { name: "Zumba", value: 10, color: "bg-orange-200" },
+export function ClassDistributionWidget({ data }: { data?: any[] }) {
+  const defaultData = [
+    { name: "Strength", value: 40, color: "bg-orange-500" },
+    { name: "Yoga", value: 30, color: "bg-amber-400" },
+    { name: "Cardio", value: 30, color: "bg-orange-300" },
   ];
+
+  const items = data || defaultData;
 
   return (
     <Widget size="md" design="mumbai" className="animate-depth-in" style={{ animationDelay: '0.6s' }}>
       <WidgetHeader>
-        <WidgetTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Class Distribution</WidgetTitle>
+        <WidgetTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Class Mix</WidgetTitle>
       </WidgetHeader>
       <WidgetContent className="flex-col gap-3 pt-1">
         <div className="flex h-2.5 w-full rounded-full overflow-hidden">
-          {data.map((item, i) => (
+          {items.map((item, i) => (
             <div 
               key={i} 
               style={{ width: `${item.value}%` }} 
@@ -216,7 +194,7 @@ export function ClassDistributionWidget() {
           ))}
         </div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 w-full">
-          {data.map((item, i) => (
+          {items.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className={`size-1.5 rounded-full ${item.color}`} />
               <span className="text-[9px] font-semibold text-muted-foreground uppercase">{item.name}</span>

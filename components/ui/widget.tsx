@@ -7,9 +7,9 @@ const widgetVariants = cva(
   {
     variants: {
       size: {
-        sm: "size-44",
-        md: "w-88 h-44",
-        lg: "w-full max-w-full h-88",
+        sm: "w-44 h-44 max-w-full",
+        md: "w-88 h-44 max-w-full",
+        lg: "w-full h-88 max-w-full",
       },
       design: {
         default: "p-4",

@@ -8,14 +8,24 @@ interface RequestOptions extends RequestInit {
 }
 
 export async function apiFetch(endpoint: string, options: RequestOptions = {}) {
-  const { gymId, token, ...init } = options;
+  const { gymId, ...init } = options;
+  let authToken = options.token;
+
+  // Auto-fetch token from localStorage if not provided
+  if (!authToken && typeof window !== "undefined") {
+    authToken = localStorage.getItem("token") || undefined;
+  }
 
   const headers = new Headers(init.headers);
   headers.set("Accept", "application/json");
-  headers.set("Content-Type", "application/json");
+  
+  // Don't set Content-Type if body is FormData (browser will set it with boundary)
+  if (!(init.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
 
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+  if (authToken) {
+    headers.set("Authorization", `Bearer ${authToken}`);
   }
 
   if (gymId) {
@@ -57,4 +67,6 @@ export const api = {
   
   delete: (endpoint: string, options?: RequestOptions) => 
     apiFetch(endpoint, { ...options, method: "DELETE" }),
+
+  validateToken: () => apiFetch("/auth/validate", { method: "GET" }),
 };

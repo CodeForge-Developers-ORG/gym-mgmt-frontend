@@ -12,21 +12,8 @@ export default function AuthLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen w-full relative flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/gym_background.jpg"
-          alt="Gym Background"
-          fill
-          className="object-cover"
-          priority
-        />
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black/40" />
-      </div>
-
-      <div className="w-full max-w-[620px] px-6 py-12 relative z-10">
+    <div className="min-h-screen w-full relative flex items-center justify-center bg-white p-4 md:p-10">
+      <div className="w-full max-w-5xl relative z-10">
         {children}
       </div>
     </div>

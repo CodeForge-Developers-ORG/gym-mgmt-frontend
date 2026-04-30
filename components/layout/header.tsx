@@ -2,6 +2,8 @@
 
 import * as React from "react"
 import { Bell, Menu, Search, LogOut } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useToast } from "@/context/toast-context"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -28,13 +30,33 @@ interface HeaderProps {
 
 export function Header({ navItems, roleName }: HeaderProps) {
   const [user, setUser] = React.useState<any>(null)
+  const router = useRouter()
+  const toast = useToast()
 
   React.useEffect(() => {
-    const userStr = localStorage.getItem("user")
-    if (userStr) {
-      setUser(JSON.parse(userStr))
+    const loadUser = () => {
+      const userStr = localStorage.getItem("user")
+      if (userStr) {
+        setUser(JSON.parse(userStr))
+      }
+    }
+
+    loadUser()
+    window.addEventListener("user-updated", loadUser)
+    window.addEventListener("storage", loadUser)
+
+    return () => {
+      window.removeEventListener("user-updated", loadUser)
+      window.removeEventListener("storage", loadUser)
     }
   }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    toast.success("Logged Out", "You have been successfully logged out.")
+    router.push("/")
+  }
 
   if (!user) return <header className="sticky top-0 z-40 h-16 border-b bg-background/80 backdrop-blur-md" />
 
@@ -81,26 +103,9 @@ export function Header({ navItems, roleName }: HeaderProps) {
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="flex flex-col gap-1 p-2 max-h-[300px] overflow-y-auto">
-              <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer">
-                <div className="h-2 w-2 mt-2 rounded-full bg-primary shrink-0" />
-                <div>
-                  <p className="text-sm font-medium">New member registered</p>
-                  <p className="text-xs text-muted-foreground">Alex Smith joined the Pro Plan</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer">
-                <div className="h-2 w-2 mt-2 rounded-full bg-primary shrink-0" />
-                <div>
-                  <p className="text-sm font-medium">Class capacity reached</p>
-                  <p className="text-xs text-muted-foreground">Morning Yoga is fully booked</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer">
-                <div className="h-2 w-2 mt-2 rounded-full bg-muted shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Payment received</p>
-                  <p className="text-xs text-muted-foreground">$59.99 from Jane Doe</p>
-                </div>
+              <div className="flex flex-col items-center gap-2 py-6 text-muted-foreground">
+                <Bell className="h-6 w-6 opacity-30" />
+                <p className="text-xs font-medium">No new notifications</p>
               </div>
             </div>
             <DropdownMenuSeparator />
@@ -114,15 +119,15 @@ export function Header({ navItems, roleName }: HeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">
               <Avatar className="h-9 w-9 border">
-                <AvatarImage src={user.avatar} alt={user.fullName} />
-                <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
+                <AvatarImage src={user.avatar} alt={user.name || user.fullName} />
+                <AvatarFallback>{getInitials(user.name || user.fullName)}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user.fullName}</p>
+                <p className="text-sm font-medium leading-none">{user.name || user.fullName}</p>
                 <p className="text-xs leading-none text-muted-foreground">
                   {user.email}
                 </p>
@@ -136,7 +141,10 @@ export function Header({ navItems, roleName }: HeaderProps) {
               Billing
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
+            <DropdownMenuItem 
+              className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
+              onClick={handleLogout}
+            >
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>

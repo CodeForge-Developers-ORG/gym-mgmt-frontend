@@ -50,4 +50,26 @@ const FieldError = React.forwardRef<
 })
 FieldError.displayName = "FieldError"
 
-export { Field, FieldGroup, FieldLabel, FieldDescription, FieldError }
+const FieldSeparator = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "relative flex items-center justify-center text-xs font-medium uppercase",
+      className
+    )}
+    {...props}
+  >
+    <div className="absolute inset-0 flex items-center">
+      <span className="w-full border-t" />
+    </div>
+    <span className="relative z-10 bg-background px-2 text-muted-foreground" data-slot="field-separator-content">
+      {props.children}
+    </span>
+  </div>
+))
+FieldSeparator.displayName = "FieldSeparator"
+
+export { Field, FieldGroup, FieldLabel, FieldDescription, FieldError, FieldSeparator }

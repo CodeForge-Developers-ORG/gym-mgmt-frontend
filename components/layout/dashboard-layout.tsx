@@ -37,14 +37,22 @@ export function DashboardLayout({ children, navItems, roleName }: DashboardLayou
     // Check if the user's role matches the path they are trying to access
     const pathRole = pathname.split("/")[1]?.toUpperCase()
     
-    // Normalize Super Admin role string
-    const normalizedCurrentRole = currentRole === "SUPERADMIN" ? "SUPER-ADMIN" : currentRole
-    const normalizedPathRole = pathRole === "SUPERADMIN" ? "SUPER-ADMIN" : pathRole
+    // Normalize role strings for comparison
+    let normalizedCurrentRole = currentRole === "ADMINISTRATOR" ? "ADMIN" : currentRole
+    if (normalizedCurrentRole === "SUPERADMIN") normalizedCurrentRole = "SUPER-ADMIN"
+    
+    let normalizedPathRole = pathRole === "ADMINISTRATOR" ? "ADMIN" : pathRole
+    if (normalizedPathRole === "SUPERADMIN") normalizedPathRole = "SUPER-ADMIN"
 
     if (normalizedCurrentRole !== normalizedPathRole && normalizedPathRole !== "API") {
       // Unauthorized role for this path, redirect to their own dashboard
-      const redirectRole = normalizedCurrentRole.toLowerCase().replace("-", "")
-      router.push(`/${redirectRole}`)
+      let redirectRole = normalizedCurrentRole.toLowerCase()
+      
+      let redirectPath = `/${redirectRole}`
+      if (redirectRole === "administrator") redirectPath = "/admin"
+      if (redirectRole === "super-admin" || redirectRole === "superadmin") redirectPath = "/super-admin"
+      
+      router.push(redirectPath)
       return
     }
 

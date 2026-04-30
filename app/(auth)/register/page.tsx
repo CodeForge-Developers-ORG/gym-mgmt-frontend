@@ -9,21 +9,23 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 import { api } from "@/lib/api-client"
+import { useToast } from "@/context/toast-context"
 
 export default function RegisterPage() {
   const router = useRouter()
+  const toast = useToast()
   const [isLoading, setIsLoading] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
 
   async function onSubmit(event: React.SyntheticEvent) {
     event.preventDefault()
     setIsLoading(true)
-    setError(null)
 
     const formData = new FormData(event.target as HTMLFormElement)
     const name = `${formData.get("firstName")} ${formData.get("lastName")}`
     const email = formData.get("email") as string
     const password = formData.get("password") as string
+
+    const loadingId = toast.loading("Creating Account", "Setting up your profile...")
 
     try {
       const response = await api.post("/auth/register", {
@@ -36,9 +38,13 @@ export default function RegisterPage() {
       localStorage.setItem("token", response.access_token)
       localStorage.setItem("user", JSON.stringify(response.user))
       
+      toast.removeNotification(loadingId)
+      toast.success("Welcome!", "Your account has been created successfully.")
+      
       router.push("/customer")
     } catch (err: any) {
-      setError(err.message || "Registration failed")
+      toast.removeNotification(loadingId)
+      toast.error("Registration Failed", err.message || "Registration failed")
     } finally {
       setIsLoading(false)
     }
@@ -56,7 +62,7 @@ export default function RegisterPage() {
       <div className="grid gap-6">
         <form onSubmit={onSubmit}>
           <div className="grid gap-4">
-            {error && <div className="text-sm font-medium text-destructive text-center bg-destructive/10 py-2 rounded-md">{error}</div>}
+
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="firstName">First name</Label>

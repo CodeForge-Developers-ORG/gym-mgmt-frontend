@@ -81,16 +81,8 @@ export function Sidebar({ items, role }: SidebarProps) {
       </div>
 
       <div className="mt-auto p-4 border-t">
-        <div className="bg-gradient-card rounded-xl p-4 border shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-              <Target className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium">Pro Plan</p>
-              <p className="text-xs text-muted-foreground">Active Subscription</p>
-            </div>
-          </div>
+        <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 text-center">
+          Staff Khata Gym Management
         </div>
       </div>
     </div>
@@ -118,6 +110,7 @@ export const adminNav: SidebarItem[] = [
   { title: "Gym Machines", href: "/admin/machines", icon: Settings },
   { title: "Machine Health", href: "/admin/machines/health", icon: Activity },
   { title: "Exercises", href: "/admin/exercises", icon: Target },
+  { title: "Membership Plans", href: "/admin/plans", icon: Receipt },
   { title: "Payments", href: "/admin/payments", icon: CreditCard },
   { title: "Settings", href: "/admin/settings", icon: Settings },
 ];

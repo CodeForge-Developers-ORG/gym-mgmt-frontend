@@ -15,22 +15,18 @@ const localizer = momentLocalizer(moment)
 
 export default function SchedulePage() {
   const [events, setEvents] = React.useState<any[]>([])
+  const [stats, setStats] = React.useState<any>(null)
   const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
-    const fetchClasses = async () => {
+    const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token")
-        const userStr = localStorage.getItem("user")
-        if (!token || !userStr) return
-
-        const user = JSON.parse(userStr)
-        const data = await api.get("/classes", {
-          token,
-          gymId: user.gym_id
-        })
+        const [classData, statsData] = await Promise.all([
+          api.get("/classes"),
+          api.get("/dashboard/admin/stats")
+        ])
         
-        const calendarEvents = data.map((cls: any) => ({
+        const calendarEvents = classData.map((cls: any) => ({
           id: cls.id,
           title: `${cls.name} (${cls.trainer?.user?.name || 'TBA'})`,
           start: new Date(cls.start_time),
@@ -39,14 +35,15 @@ export default function SchedulePage() {
         }))
         
         setEvents(calendarEvents)
+        setStats(statsData)
       } catch (err) {
-        console.error("Failed to fetch schedule", err)
+        console.error("Failed to fetch schedule data", err)
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchClasses()
+    fetchData()
   }, [])
 
   return (
@@ -62,7 +59,7 @@ export default function SchedulePage() {
         <AnalogClockWidget />
         <CalendarWidget />
         <ClassDistributionWidget />
-        <FitnessScoreWidget />
+        <FitnessScoreWidget data={{ revenue: stats?.monthly_revenue, members: stats?.total_members }} />
       </div>
       
       <Card className="flex-1 p-4 bg-background">

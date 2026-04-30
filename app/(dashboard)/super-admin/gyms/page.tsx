@@ -13,12 +13,37 @@ import { Label } from "@/components/ui/label"
 import { api } from "@/lib/api-client"
 import { formatDate } from "@/lib/utils"
 import { SlideInText } from "@/components/ui/slide-in-text"
+import { useToast } from "@/context/toast-context"
+import { ActionMenu, type ActionMenuItem } from "@/components/ui/action-menu"
+import { 
+  Delete01Icon, 
+  ViewOffIcon, 
+  Link01Icon,
+  CheckmarkCircle01Icon,
+  SettingsIcon
+} from "@hugeicons/core-free-icons"
+import { ConfirmModal } from "@/components/ui/confirm-modal"
 
 export default function GymsPage() {
   const [gyms, setGyms] = React.useState<any[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [formLoading, setFormLoading] = React.useState(false)
+  const [passwordDialogOpen, setPasswordDialogOpen] = React.useState(false)
+  const [selectedGymForPassword, setSelectedGymForPassword] = React.useState<any>(null)
+  const [confirmConfig, setConfirmConfig] = React.useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    onConfirm: () => void;
+    variant?: "default" | "destructive";
+  }>({
+    open: false,
+    title: "",
+    description: "",
+    onConfirm: () => {},
+  })
+  const toast = useToast()
 
   const fetchGyms = async () => {
     try {
@@ -27,8 +52,8 @@ export default function GymsPage() {
 
       const data = await api.get("/super-admin/gyms", { token })
       setGyms(Array.isArray(data) ? data : [])
-    } catch (err) {
-      console.error("Failed to fetch gyms", err)
+    } catch (err: any) {
+      toast.error("Fetch Failed", err.message || "Failed to fetch gyms.")
     } finally {
       setIsLoading(false)
     }
@@ -44,6 +69,8 @@ export default function GymsPage() {
     const form = e.target as HTMLFormElement
     const formData = new FormData(form)
 
+    const loadingId = toast.loading("Adding Gym", "Registering new gym tenant...")
+
     try {
       const token = localStorage.getItem("token")
       if (!token) return
@@ -53,13 +80,97 @@ export default function GymsPage() {
         address: formData.get("address"),
         phone: formData.get("phone"),
         email: formData.get("email"),
-      }, { token })
+        password: formData.get("password"),
+      })
 
+      toast.removeNotification(loadingId)
+      toast.success("Gym Added", "Gym and Administrator account created successfully.")
+      
       setDialogOpen(false)
       form.reset()
       fetchGyms()
-    } catch (err) {
-      console.error("Failed to add gym", err)
+    } catch (err: any) {
+      toast.removeNotification(loadingId)
+      toast.error("Creation Failed", err.message || "Failed to add gym.")
+    } finally {
+      setFormLoading(false)
+    }
+  }
+
+  async function handleAction(gymId: string, actionId: string) {
+    const gym = gyms.find(g => g._id === gymId || g.id === gymId)
+    if (!gym) return
+
+    const token = localStorage.getItem("token")
+    if (!token) return
+
+    switch (actionId) {
+      case "delete":
+        setConfirmConfig({
+          open: true,
+          title: "Delete Gym Branch?",
+          description: `Are you sure you want to delete ${gym.name}? This action cannot be undone and will remove all associated data.`,
+          variant: "destructive",
+          onConfirm: async () => {
+            const delLoading = toast.loading("Deleting Gym", `Removing ${gym.name}...`)
+            try {
+              await api.delete(`/super-admin/gyms/${gymId}`, { token })
+              toast.removeNotification(delLoading)
+              toast.success("Gym Deleted", "Branch has been removed successfully.")
+              fetchGyms()
+            } catch (err: any) {
+              toast.removeNotification(delLoading)
+              toast.error("Delete Failed", err.message || "Failed to delete gym.")
+            }
+          }
+        })
+        break
+
+      case "toggle-status":
+        const newStatus = gym.status === "Active" ? "Inactive" : "Active"
+        const statusLoading = toast.loading("Updating Status", `Setting ${gym.name} to ${newStatus}...`)
+        try {
+          await api.put(`/super-admin/gyms/${gymId}`, { status: newStatus }, { token })
+          toast.removeNotification(statusLoading)
+          toast.success("Status Updated", `${gym.name} is now ${newStatus}.`)
+          fetchGyms()
+        } catch (err: any) {
+          toast.removeNotification(statusLoading)
+          toast.error("Update Failed", err.message || "Failed to update status.")
+        }
+        break
+
+      case "map":
+        toast.info("Map Subscriptions", "Mapping interface coming soon.")
+        break
+
+      case "password":
+        setSelectedGymForPassword(gym)
+        setPasswordDialogOpen(true)
+        break
+    }
+  }
+
+  async function handleUpdatePassword(e: React.FormEvent) {
+    e.preventDefault()
+    if (!selectedGymForPassword) return
+    
+    setFormLoading(true)
+    const form = e.target as HTMLFormElement
+    const formData = new FormData(form)
+    const password = formData.get("password") as string
+
+    const loadingId = toast.loading("Updating Password", "Setting new administrator password...")
+
+    try {
+      await api.put(`/super-admin/gyms/${selectedGymForPassword._id || selectedGymForPassword.id}/admin-password`, { password })
+      toast.removeNotification(loadingId)
+      toast.success("Password Updated", "Administrator password has been changed.")
+      setPasswordDialogOpen(false)
+      form.reset()
+    } catch (err: any) {
+      toast.removeNotification(loadingId)
+      toast.error("Update Failed", err.message || "Failed to update password.")
     } finally {
       setFormLoading(false)
     }
@@ -85,19 +196,27 @@ export default function GymsPage() {
     },
     {
       header: "Tenant ID",
-      cell: (row) => <span className="font-mono text-[10px] opacity-50">{row._id ? row._id.substring(0, 8) : "-"}</span>,
+      cell: (row) => <span className="font-mono text-[10px] font-bold text-primary">{row.tenant_id || "-"}</span>,
     },
     {
       header: "Created",
       cell: (row) => <div className="text-sm text-muted-foreground">{row.created_at ? formatDate(row.created_at) : "-"}</div>,
     },
     {
-      header: "",
-      cell: () => (
-        <Button variant="ghost" size="icon">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      ),
+      header: "Actions",
+      cell: (row) => {
+        const menuItems: ActionMenuItem[] = [
+          { id: "map", label: "Map Subscriptions", icon: Link01Icon },
+          { id: "password", label: "Change Admin Password", icon: SettingsIcon },
+          { 
+            id: "toggle-status", 
+            label: row.status === "Active" ? "Mark Inactive" : "Mark Active", 
+            icon: row.status === "Active" ? ViewOffIcon : CheckmarkCircle01Icon 
+          },
+          { id: "delete", label: "Delete Gym", icon: Delete01Icon, variant: "destructive" },
+        ]
+        return <ActionMenu items={menuItems} onAction={(id) => handleAction(row._id || row.id, id)} />
+      },
     },
   ]
 
@@ -109,48 +228,54 @@ export default function GymsPage() {
           <p className="text-muted-foreground">Manage all gym tenants, view performance and configure settings.</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <form onSubmit={handleAddGym}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Gym Tenant
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-sm">
+          <DialogTrigger asChild>
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Gym Tenant
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-sm">
+            <form onSubmit={handleAddGym}>
               <DialogHeader>
                 <DialogTitle>Add New Gym Tenant</DialogTitle>
                 <DialogDescription>
                   Register a new gym tenant on the platform.
                 </DialogDescription>
               </DialogHeader>
-              <FieldGroup>
-                <Field>
-                  <Label htmlFor="gym-name">Gym Name</Label>
-                  <Input id="gym-name" name="name" placeholder="e.g. PowerFit Downtown" required />
-                </Field>
-                <Field>
-                  <Label htmlFor="gym-address">Address</Label>
-                  <Input id="gym-address" name="address" placeholder="123 Main Street, City" required />
-                </Field>
-                <Field>
-                  <Label htmlFor="gym-phone">Phone</Label>
-                  <Input id="gym-phone" name="phone" placeholder="+1 234 567 890" />
-                </Field>
-                <Field>
-                  <Label htmlFor="gym-email">Email</Label>
-                  <Input id="gym-email" name="email" type="email" placeholder="contact@gym.com" />
-                </Field>
-              </FieldGroup>
+              <div className="py-4">
+                <FieldGroup>
+                  <Field>
+                    <Label htmlFor="gym-name">Gym Name</Label>
+                    <Input id="gym-name" name="name" placeholder="e.g. PowerFit Downtown" required />
+                  </Field>
+                  <Field>
+                    <Label htmlFor="gym-address">Address</Label>
+                    <Input id="gym-address" name="address" placeholder="123 Main Street, City" required />
+                  </Field>
+                  <Field>
+                    <Label htmlFor="gym-phone">Phone</Label>
+                    <Input id="gym-phone" name="phone" placeholder="+1 234 567 890" />
+                  </Field>
+                  <Field>
+                    <Label htmlFor="gym-email">Email (Admin Account)</Label>
+                    <Input id="gym-email" name="email" type="email" placeholder="contact@gym.com" required />
+                  </Field>
+                  <Field>
+                    <Label htmlFor="gym-password">Admin Password</Label>
+                    <Input id="gym-password" name="password" type="password" placeholder="••••••••" required minLength={6} />
+                  </Field>
+                </FieldGroup>
+              </div>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button type="button" variant="outline">Cancel</Button>
                 </DialogClose>
                 <Button type="submit" disabled={formLoading}>
                   {formLoading ? "Creating..." : "Create Tenant"}
                 </Button>
               </DialogFooter>
-            </DialogContent>
-          </form>
+            </form>
+          </DialogContent>
         </Dialog>
       </div>
 
@@ -159,6 +284,43 @@ export default function GymsPage() {
         columns={columns} 
         searchPlaceholder="Search gym tenants..." 
       />
+
+      <ConfirmModal
+        open={confirmConfig.open}
+        onOpenChange={(open) => setConfirmConfig(prev => ({ ...prev, open }))}
+        title={confirmConfig.title}
+        description={confirmConfig.description}
+        onConfirm={confirmConfig.onConfirm}
+        variant={confirmConfig.variant}
+        confirmText={confirmConfig.variant === "destructive" ? "Delete Branch" : "Confirm"}
+      />
+
+      <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <form onSubmit={handleUpdatePassword}>
+            <DialogHeader>
+              <DialogTitle>Update Admin Password</DialogTitle>
+              <DialogDescription>
+                Change the login password for {selectedGymForPassword?.name}&apos;s administrator.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Field>
+                <Label htmlFor="new-password">New Password</Label>
+                <Input id="new-password" name="password" type="password" placeholder="••••••••" required minLength={6} />
+              </Field>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button type="submit" disabled={formLoading}>
+                {formLoading ? "Updating..." : "Update Password"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
