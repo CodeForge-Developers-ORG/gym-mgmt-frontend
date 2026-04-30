@@ -1,27 +1,35 @@
 "use client"
 
 import * as React from "react"
-import { Search } from "lucide-react"
+import { Search, Dumbbell } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { BodyAnatomySvg } from "@/components/illustrations/gym-svgs"
 import Image from "next/image"
 import { SlideInText } from "@/components/ui/slide-in-text"
+import { api } from "@/lib/api-client"
 
 export default function ExercisesPage() {
   const [search, setSearch] = React.useState("");
+  const [exercises, setExercises] = React.useState<any[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  const exercises = [
-    { name: "Dumbbell Press", muscle: "Chest", equipment: "Free Weights", type: "Compound", image: "/vector_icons/Dumbell.png" },
-    { name: "Kettlebell Swings", muscle: "Legs", equipment: "Free Weights", type: "Compound", image: "/vector_icons/Kettlebell.png" },
-    { name: "Gymnast Rings Pull", muscle: "Back", equipment: "Rings", type: "Compound", image: "/vector_icons/Ring.png" },
-    { name: "Plate Raises", muscle: "Shoulders", equipment: "Plates", type: "Isolation", image: "/vector_icons/Gym Plate.png" },
-    { name: "Speed Bag Boxing", muscle: "Arms", equipment: "Speed Bag", type: "Cardio", image: "/vector_icons/Standing Speed Ball.png" },
-    { name: "Ab Wheel Rollouts", muscle: "Core", equipment: "Wheel", type: "Isolation", image: "/vector_icons/wheele_roller.png" },
-  ]
+  React.useEffect(() => {
+    const fetchExercises = async () => {
+      try {
+        const data = await api.get("/exercises");
+        setExercises(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to fetch exercises", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchExercises();
+  }, []);
 
-  const filtered = exercises.filter(e => e.name.toLowerCase().includes(search.toLowerCase()) || e.muscle.toLowerCase().includes(search.toLowerCase()));
+  const filtered = exercises.filter(e => e.name.toLowerCase().includes(search.toLowerCase()) || (e.muscle || "").toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="flex flex-col gap-6">
@@ -57,7 +65,11 @@ export default function ExercisesPage() {
 
         {/* Exercises Grid */}
         <div className="lg:col-span-3 grid sm:grid-cols-3 gap-6 content-start">
-          {filtered.map((ex, i) => (
+          {isLoading ? (
+            [1, 2, 3, 4, 5, 6].map(i => (
+              <Card key={i} className="h-80 animate-pulse bg-muted/50" />
+            ))
+          ) : filtered.map((ex, i) => (
             <Card key={i} className="hover:border-primary/50 transition-colors flex flex-col group">
               <CardHeader className="pb-2 flex-grow-0">
                 <div className="flex justify-between items-start">
@@ -71,13 +83,19 @@ export default function ExercisesPage() {
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex justify-center items-center p-6 bg-muted/10 rounded-b-xl border-t mt-4 relative min-h-[200px]">
-                <Image 
-                  src={ex.image} 
-                  alt={ex.name}
-                  fill
-                  className="object-contain p-6 group-hover:scale-110 transition-transform drop-shadow-lg"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
+                {ex.image ? (
+                  <Image 
+                    src={ex.image} 
+                    alt={ex.name}
+                    fill
+                    className="object-contain p-6 group-hover:scale-110 transition-transform drop-shadow-lg"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                ) : (
+                  <div className="text-muted-foreground opacity-20">
+                    <Dumbbell className="h-12 w-12" />
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

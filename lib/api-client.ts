@@ -57,13 +57,13 @@ export const api = {
     apiFetch(endpoint, { ...options, method: "GET" }),
   
   post: (endpoint: string, body: any, options?: RequestOptions) => 
-    apiFetch(endpoint, { ...options, method: "POST", body: JSON.stringify(body) }),
+    apiFetch(endpoint, { ...options, method: "POST", body: body instanceof FormData ? body : JSON.stringify(body) }),
   
   put: (endpoint: string, body: any, options?: RequestOptions) => 
-    apiFetch(endpoint, { ...options, method: "PUT", body: JSON.stringify(body) }),
+    apiFetch(endpoint, { ...options, method: "PUT", body: body instanceof FormData ? body : JSON.stringify(body) }),
   
   patch: (endpoint: string, body: any, options?: RequestOptions) => 
-    apiFetch(endpoint, { ...options, method: "PATCH", body: JSON.stringify(body) }),
+    apiFetch(endpoint, { ...options, method: "PATCH", body: body instanceof FormData ? body : JSON.stringify(body) }),
   
   delete: (endpoint: string, options?: RequestOptions) => 
     apiFetch(endpoint, { ...options, method: "DELETE" }),

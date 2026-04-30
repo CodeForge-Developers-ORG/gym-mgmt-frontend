@@ -68,7 +68,7 @@ export default function PaymentsPage() {
           <Download className="h-4 w-4" /> Export Ledger
         </Button>
       </div>
-      <DataTable data={payments} columns={columns} searchPlaceholder="Search transactions..." />
+      <DataTable data={payments} columns={columns} searchPlaceholder="Search transactions..." isLoading={isLoading} />
     </div>
   )
 }

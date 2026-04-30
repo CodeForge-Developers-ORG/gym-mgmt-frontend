@@ -70,7 +70,7 @@ export default function MachineInventoryPage() {
         </div>
       </div>
       
-      <DataTable data={machines} columns={columns} searchPlaceholder="Search by machine ID or name..." />
+      <DataTable data={machines} columns={columns} searchPlaceholder="Search by machine ID or name..." isLoading={isLoading} />
     </div>
   )
 }

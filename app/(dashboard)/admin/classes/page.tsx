@@ -60,7 +60,7 @@ export default function ClassesPage() {
           <Plus className="h-4 w-4" /> Add Class
         </Button>
       </div>
-      <DataTable data={classes} columns={columns} searchPlaceholder="Search classes..." />
+      <DataTable data={classes} columns={columns} searchPlaceholder="Search classes..." isLoading={isLoading} />
     </div>
   )
 }

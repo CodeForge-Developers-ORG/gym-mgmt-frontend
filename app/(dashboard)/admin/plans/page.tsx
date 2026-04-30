@@ -90,7 +90,7 @@ export default function PlansPage() {
       })
       toast.success("Success", "Membership plan created.")
       setDialogOpen(false)
-      fetchPlans()
+      fetchData()
       setNewPlan({ name: "", monthly_price: 0, yearly_price: 0, features: [""], status: "Active" })
     } catch (err) {
       toast.error("Error", "Failed to create plan.")
@@ -101,7 +101,7 @@ export default function PlansPage() {
     try {
       await api.delete(`/plans/${id}`)
       toast.success("Deleted", "Plan has been removed.")
-      fetchPlans()
+      fetchData()
     } catch (err) {
       toast.error("Error", "Failed to delete plan.")
     }

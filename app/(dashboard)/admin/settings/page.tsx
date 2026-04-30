@@ -163,13 +163,7 @@ export default function AdminSettingsPage() {
     const token = localStorage.getItem("token")
     try {
       const fd = new FormData(); fd.append("avatar", file)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/avatar`, {
-        method: "POST", 
-        headers: { Authorization: `Bearer ${token}` }, 
-        body: fd,
-      })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.message)
+      const data = await api.post("/auth/avatar", fd)
       setUser(data.user)
       localStorage.setItem("user", JSON.stringify(data.user))
       window.dispatchEvent(new Event("user-updated"))
