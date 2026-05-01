@@ -6,17 +6,10 @@ import {
   Users, Activity, TrendingUp, CreditCard, Dumbbell,
   ArrowUpRight, ArrowDownRight, MoreHorizontal, ExternalLink,
   RefreshCw, CheckCircle2, AlertCircle, Clock, Calendar,
-  UserPlus, Search
+  UserPlus, Search, Settings, Trash2
 } from "lucide-react"
 import { ActionMenu, type ActionMenuItem } from "@/components/ui/action-menu"
-import { 
-  Delete01Icon, 
-  ViewOffIcon, 
-  UserGroupIcon,
-  CheckmarkCircle01Icon,
-  SettingsIcon,
-  Money01Icon
-} from "@hugeicons/core-free-icons"
+
 import { useToast } from "@/context/toast-context"
 import { ConfirmModal } from "@/components/ui/confirm-modal"
 import {
@@ -421,9 +414,9 @@ export default function AdminDashboard() {
                   <td className="px-6 py-4 text-right">
                     <ActionMenu 
                       items={[
-                        { id: "edit", label: "Edit Member", icon: SettingsIcon },
-                        { id: "payments", label: "Payment History", icon: Money01Icon },
-                        { id: "delete", label: "Terminate", icon: Delete01Icon, variant: "destructive" },
+                        { id: "edit", label: "Edit Member", icon: Settings },
+                        { id: "payments", label: "Payment History", icon: CreditCard },
+                        { id: "delete", label: "Terminate", icon: Trash2, variant: "destructive" },
                       ]} 
                       onAction={(id) => toast.info("Action", `Performing ${id} for ${member.name}`)} 
                     />
