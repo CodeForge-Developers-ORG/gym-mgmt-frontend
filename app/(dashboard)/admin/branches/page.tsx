@@ -21,7 +21,7 @@ import { useToast } from "@/context/toast-context"
 import { SlideInText } from "@/components/ui/slide-in-text"
 import { ActionMenu } from "@/components/ui/action-menu"
 import { cn } from "@/lib/utils"
-import { Settings as SettingsIcon, Trash2 as Delete01Icon, Building2 as BuildingIcon, MapPin as Location01Icon, Phone as CallIcon, BarChart3 as ChartBar01Icon, Users as UserMultiple01Icon, User as UserIcon } from "lucide-react"
+import { Settings, Trash2, Building2 as BuildingIcon, MapPin as Location01Icon, Phone as CallIcon, BarChart3 as ChartBar01Icon, Users as UserMultiple01Icon, User as UserIcon } from "lucide-react"
 
 export default function BranchesPage() {
   const { branches, stats, isLoading, refreshBranches } = useBranch()
@@ -118,8 +118,8 @@ export default function BranchesPage() {
       cell: (row) => (
         <ActionMenu 
           items={[
-            { id: "edit", label: "Edit Branch", icon: SettingsIcon },
-            { id: "delete", label: "Delete", icon: Delete01Icon, variant: "destructive" },
+            { id: "edit", label: "Edit Branch", icon: Settings },
+            { id: "delete", label: "Delete", icon: Trash2, variant: "destructive" },
           ]} 
           onAction={(id) => {
             toast.info("Coming Soon", "This feature is being finalized.")
