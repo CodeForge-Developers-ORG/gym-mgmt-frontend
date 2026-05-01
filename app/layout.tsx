@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { Inter, Geist } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ToastProvider } from "@/context/toast-context";
+import { BranchProvider } from "@/context/branch-context";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const inter = Inter({ subsets: ["latin"] });
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
+});
 
 export const metadata: Metadata = {
   title: "Staff Khata Gym Management",
@@ -20,17 +22,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
-      <body className={`antialiased min-h-screen bg-background text-foreground flex flex-col ${inter.className}`}>
+    <html lang="en" suppressHydrationWarning className={cn(jetbrainsMono.variable)}>
+      <body suppressHydrationWarning className={`antialiased min-h-screen bg-background text-foreground flex flex-col ${jetbrainsMono.className}`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          suppressHydrationWarning
         >
-          <ToastProvider>
-            {children}
-          </ToastProvider>
+          <BranchProvider>
+            <ToastProvider>
+              {children}
+            </ToastProvider>
+          </BranchProvider>
         </ThemeProvider>
       </body>
     </html>

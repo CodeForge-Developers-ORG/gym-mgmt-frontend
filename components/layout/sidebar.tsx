@@ -18,7 +18,8 @@ import {
   User,
   HeartPulse,
   LogOut,
-  Target
+  Target,
+  Fingerprint
 } from "lucide-react"
 
 import Image from "next/image"
@@ -38,9 +39,9 @@ export function Sidebar({ items, role }: SidebarProps) {
   const pathname = usePathname()
 
   return (
-    <div className="flex h-full w-full flex-col bg-card border-r shadow-sm">
-      <div className="p-6 flex flex-col items-center gap-3 border-b">
-        <div className="relative w-full h-12">
+    <div className="flex h-full w-full flex-col bg-brand-secondary text-brand-secondary-foreground border-r border-white/10 shadow-2xl">
+      <div className="p-4 flex flex-col items-center gap-3 border-b border-white/10">
+        <div className="relative w-full h-14">
           <Image 
             src="/logo/logo.png" 
             alt="Staff Khata Logo" 
@@ -54,13 +55,15 @@ export function Sidebar({ items, role }: SidebarProps) {
         </div>
       </div>
 
-      <div className="px-4 py-2">
+      <div className="flex-1 px-4 py-2 overflow-y-auto scrollbar-hide">
         <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 px-2">
           {role} Navigation
         </div>
         <nav className="flex flex-col gap-1.5">
-          {items.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`) && item.href !== `/${role.toLowerCase()}`
+          {items.map((item, index) => {
+            const isActive = index === 0 
+              ? pathname === item.href 
+              : pathname === item.href || pathname.startsWith(`${item.href}/`)
             return (
               <Link
                 key={item.href}
@@ -68,11 +71,11 @@ export function Sidebar({ items, role }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    ? "bg-[#1a1a1a] text-white shadow-lg shadow-black/10"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 )}
               >
-                <item.icon className={cn("h-4 w-4", isActive ? "text-primary-foreground" : "text-muted-foreground/70")} />
+                <item.icon className={cn("h-4 w-4", isActive ? "text-white" : "text-muted-foreground/70")} />
                 {item.title}
               </Link>
             )
@@ -102,6 +105,7 @@ export const superAdminNav: SidebarItem[] = [
 
 export const adminNav: SidebarItem[] = [
   { title: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { title: "Gym Branches", href: "/admin/branches", icon: Building2 },
   { title: "Members", href: "/admin/members", icon: Users },
   { title: "Trainers", href: "/admin/trainers", icon: Activity },
   { title: "Classes", href: "/admin/classes", icon: Dumbbell },
@@ -111,6 +115,7 @@ export const adminNav: SidebarItem[] = [
   { title: "Machine Health", href: "/admin/machines/health", icon: Activity },
   { title: "Exercises", href: "/admin/exercises", icon: Target },
   { title: "Membership Plans", href: "/admin/plans", icon: Receipt },
+  { title: "Biometric Setup", href: "/admin/biometric-setup", icon: Fingerprint },
   { title: "Payments", href: "/admin/payments", icon: CreditCard },
   { title: "Settings", href: "/admin/settings", icon: Settings },
 ];

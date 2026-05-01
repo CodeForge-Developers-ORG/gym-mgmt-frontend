@@ -2,16 +2,14 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HugeiconsIcon } from "@hugeicons/react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import {
-  MoreHorizontalCircle01Icon,
-} from "@hugeicons/core-free-icons";
+import { MoreHorizontal } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface ActionMenuItem {
   id: string;
   label: string;
-  icon: any;
+  icon: React.ElementType;
   variant?: "default" | "destructive";
 }
 
@@ -34,10 +32,7 @@ export function ActionMenu({ items, onAction }: ActionMenuProps) {
             layout
             className="flex items-center justify-center h-9 w-9 rounded-xl bg-popover border border-border shadow-sm cursor-pointer hover:bg-muted/50 transition-colors"
           >
-            <HugeiconsIcon
-              icon={MoreHorizontalCircle01Icon}
-              className="w-5 h-5 text-muted-foreground"
-            />
+            <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
           </motion.div>
         </DropdownMenuPrimitive.Trigger>
 
@@ -62,6 +57,7 @@ export function ActionMenu({ items, onAction }: ActionMenuProps) {
                 {items.map((item, index) => {
                   const isDestructive = item.variant === "destructive";
                   const isHovered = hoveredItem === item.id;
+                  const Icon = item.icon;
 
                   return (
                     <DropdownMenuPrimitive.Item
@@ -79,48 +75,58 @@ export function ActionMenu({ items, onAction }: ActionMenuProps) {
                           duration: 0.2,
                           ease: easeOutQuint,
                         }}
-                        className={`relative flex items-center gap-3 rounded-xl text-xs cursor-pointer transition-all duration-200 ease-out pl-3 py-2.5 ${
+                        className={cn(
+                          "relative flex items-center gap-3 rounded-xl text-xs cursor-pointer transition-all duration-200 ease-out pl-3 py-2.5",
                           isDestructive
                             ? "text-red-500 hover:text-red-600"
                             : "text-muted-foreground hover:text-foreground"
-                        }`}
+                        )}
                       >
                         {/* Hover indicator */}
-                        {isHovered && (
-                          <motion.div
-                            layoutId="hoverIndicator"
-                            className={`absolute inset-0 rounded-xl ${
-                              isDestructive ? "bg-red-500/10" : "bg-muted"
-                            }`}
-                            transition={{
-                              type: "spring",
-                              damping: 30,
-                              stiffness: 520,
-                              mass: 0.8,
-                            }}
-                          />
-                        )}
+                        <AnimatePresence>
+                          {isHovered && (
+                            <motion.div
+                              layoutId="hoverIndicator"
+                              className={cn(
+                                "absolute inset-0 rounded-xl",
+                                isDestructive ? "bg-red-500/10" : "bg-muted"
+                              )}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{
+                                type: "spring",
+                                damping: 30,
+                                stiffness: 520,
+                                mass: 0.8,
+                              }}
+                            />
+                          )}
+                        </AnimatePresence>
                         
                         {/* Left bar indicator */}
-                        {isHovered && (
-                          <motion.div
-                            layoutId="leftBar"
-                            className={`absolute left-0 top-0 bottom-0 my-auto w-[3px] h-5 rounded-full ${
-                              isDestructive ? "bg-red-500" : "bg-primary"
-                            }`}
-                            transition={{
-                              type: "spring",
-                              damping: 30,
-                              stiffness: 520,
-                              mass: 0.8,
-                            }}
-                          />
-                        )}
+                        <AnimatePresence>
+                          {isHovered && (
+                            <motion.div
+                              layoutId="leftBar"
+                              className={cn(
+                                "absolute left-0 top-0 bottom-0 my-auto w-[3px] h-5 rounded-full",
+                                isDestructive ? "bg-red-500" : "bg-primary"
+                              )}
+                              initial={{ opacity: 0, scale: 0 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0 }}
+                              transition={{
+                                type: "spring",
+                                damping: 30,
+                                stiffness: 520,
+                                mass: 0.8,
+                              }}
+                            />
+                          )}
+                        </AnimatePresence>
 
-                        <HugeiconsIcon
-                          icon={item.icon}
-                          className="w-4 h-4 relative z-10"
-                        />
+                        <Icon className="w-4 h-4 relative z-10" />
                         <span className="font-bold relative z-10">
                           {item.label}
                         </span>

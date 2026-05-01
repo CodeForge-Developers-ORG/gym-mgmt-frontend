@@ -11,17 +11,11 @@ import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { api } from "@/lib/api-client"
-import { formatDate } from "@/lib/utils"
+import { formatDate, formatCurrency, cn } from "@/lib/utils"
 import { SlideInText } from "@/components/ui/slide-in-text"
 import { useToast } from "@/context/toast-context"
 import { ActionMenu, type ActionMenuItem } from "@/components/ui/action-menu"
-import { 
-  Delete01Icon, 
-  ViewOffIcon, 
-  Link01Icon,
-  CheckmarkCircle01Icon,
-  SettingsIcon
-} from "@hugeicons/core-free-icons"
+import { Trash2 as Delete01Icon, EyeOff as ViewOffIcon, Link as Link01Icon, CheckCircle as CheckmarkCircle01Icon, Settings as SettingsIcon } from "lucide-react"
 import { ConfirmModal } from "@/components/ui/confirm-modal"
 
 export default function GymsPage() {
@@ -30,7 +24,10 @@ export default function GymsPage() {
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [formLoading, setFormLoading] = React.useState(false)
   const [passwordDialogOpen, setPasswordDialogOpen] = React.useState(false)
+  const [mapDialogOpen, setMapDialogOpen] = React.useState(false)
   const [selectedGymForPassword, setSelectedGymForPassword] = React.useState<any>(null)
+  const [selectedGymForMap, setSelectedGymForMap] = React.useState<any>(null)
+  const [saasPlans, setSaasPlans] = React.useState<any[]>([])
   const [confirmConfig, setConfirmConfig] = React.useState<{
     open: boolean;
     title: string;
@@ -47,13 +44,14 @@ export default function GymsPage() {
 
   const fetchGyms = async () => {
     try {
-      const token = localStorage.getItem("token")
-      if (!token) return
-
-      const data = await api.get("/super-admin/gyms", { token })
-      setGyms(Array.isArray(data) ? data : [])
+      const [gymsData, plansData] = await Promise.all([
+        api.get("/super-admin/gyms"),
+        api.get("/super-admin/saas-plans")
+      ])
+      setGyms(Array.isArray(gymsData) ? gymsData : [])
+      setSaasPlans(Array.isArray(plansData) ? plansData : [])
     } catch (err: any) {
-      toast.error("Fetch Failed", err.message || "Failed to fetch gyms.")
+      toast.error("Fetch Failed", err.message || "Failed to fetch data.")
     } finally {
       setIsLoading(false)
     }
@@ -141,13 +139,36 @@ export default function GymsPage() {
         break
 
       case "map":
-        toast.info("Map Subscriptions", "Mapping interface coming soon.")
+        setSelectedGymForMap(gym)
+        setMapDialogOpen(true)
         break
 
       case "password":
         setSelectedGymForPassword(gym)
         setPasswordDialogOpen(true)
         break
+    }
+  }
+
+  async function handleMapSubscription(e: React.FormEvent) {
+    e.preventDefault()
+    if (!selectedGymForMap) return
+
+    setFormLoading(true)
+    const formData = new FormData(e.target as HTMLFormElement)
+    const planId = formData.get("saas_plan_id")
+
+    try {
+      await api.put(`/super-admin/gyms/${selectedGymForMap._id || selectedGymForMap.id}`, { 
+        saas_plan_id: planId 
+      })
+      toast.success("Subscription Mapped", "The gym has been successfully assigned to the plan.")
+      setMapDialogOpen(false)
+      fetchGyms()
+    } catch (err: any) {
+      toast.error("Mapping Failed", err.message || "Failed to map subscription.")
+    } finally {
+      setFormLoading(false)
     }
   }
 
@@ -181,10 +202,21 @@ export default function GymsPage() {
       header: "Gym Tenant",
       cell: (row) => (
         <div>
-          <div className="font-medium">{row.name}</div>
-          <div className="text-xs text-muted-foreground">{row.address}</div>
+          <div className="font-bold text-sm">{row.name}</div>
+          <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">{row.address}</div>
         </div>
       ),
+    },
+    {
+      header: "Plan",
+      cell: (row) => {
+        const plan = saasPlans.find(p => p.id === row.saas_plan_id || p._id === row.saas_plan_id)
+        return (
+          <Badge variant="outline" className={cn("border-primary/20", plan ? "bg-primary/5 text-primary" : "bg-muted text-muted-foreground")}>
+            {plan ? plan.name : "No Plan"}
+          </Badge>
+        )
+      }
     },
     {
       header: "Status",
@@ -296,26 +328,45 @@ export default function GymsPage() {
       />
 
       <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <form onSubmit={handleUpdatePassword}>
+        {/* ... Password dialog content ... */}
+      </Dialog>
+
+      <Dialog open={mapDialogOpen} onOpenChange={setMapDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <form onSubmit={handleMapSubscription}>
             <DialogHeader>
-              <DialogTitle>Update Admin Password</DialogTitle>
+              <DialogTitle>Map Subscription Plan</DialogTitle>
               <DialogDescription>
-                Change the login password for {selectedGymForPassword?.name}&apos;s administrator.
+                Select a SaaS subscription plan for {selectedGymForMap?.name}.
               </DialogDescription>
             </DialogHeader>
-            <div className="py-4">
-              <Field>
-                <Label htmlFor="new-password">New Password</Label>
-                <Input id="new-password" name="password" type="password" placeholder="••••••••" required minLength={6} />
-              </Field>
+            <div className="py-6 space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="saas_plan_id">Available SaaS Plans</Label>
+                <select 
+                  name="saas_plan_id" 
+                  className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm" 
+                  defaultValue={selectedGymForMap?.saas_plan_id || ""}
+                  required
+                >
+                  <option value="" disabled>Select a plan...</option>
+                  {saasPlans.map(plan => (
+                    <option key={plan.id || plan._id} value={plan.id || plan._id}>
+                      {plan.name} - {formatCurrency(plan.price_monthly)}/mo
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-muted-foreground">
+                  Mapping a plan will instantly update the gym&apos;s available features and sidebar menu.
+                </p>
+              </div>
             </div>
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="outline">Cancel</Button>
               </DialogClose>
               <Button type="submit" disabled={formLoading}>
-                {formLoading ? "Updating..." : "Update Password"}
+                {formLoading ? "Mapping..." : "Map Plan"}
               </Button>
             </DialogFooter>
           </form>

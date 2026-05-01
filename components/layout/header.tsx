@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { RoleSwitcher } from "@/components/layout/role-switcher"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
+import { BranchSelector } from "@/components/layout/branch-selector"
 import { Sidebar, type SidebarItem } from "@/components/layout/sidebar"
 import {
   DropdownMenu,
@@ -70,15 +71,16 @@ export function Header({ navItems, roleName }: HeaderProps) {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72 p-0 border-r-0">
+          <SheetContent side="left" className="w-80 p-0 border-r shadow-2xl bg-background">
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <Sidebar items={navItems} role={roleName} />
           </SheetContent>
         </Sheet>
       </div>
 
-      <div className="hidden lg:flex flex-1 items-center gap-4 max-w-md">
-        <div className="relative w-full">
+      <div className="hidden lg:flex flex-1 items-center gap-4 max-w-2xl">
+        <BranchSelector />
+        <div className="relative w-full max-w-md">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
