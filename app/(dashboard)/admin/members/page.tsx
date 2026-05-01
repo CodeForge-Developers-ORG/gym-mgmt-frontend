@@ -16,7 +16,7 @@ import { getInitials, formatDate, cn } from "@/lib/utils"
 import { SlideInText } from "@/components/ui/slide-in-text"
 import { useToast } from "@/context/toast-context"
 import { ActionMenu, type ActionMenuItem } from "@/components/ui/action-menu"
-import { Settings as SettingsIcon, Trash2 as Delete01Icon, User as UserIcon } from "lucide-react"
+import { Settings, Trash2, User } from "lucide-react"
 import { ConfirmModal } from "@/components/ui/confirm-modal"
 import { useBranch } from "@/context/branch-context"
 import { DatePicker } from "@/components/ui/date-picker"
@@ -204,11 +204,11 @@ export default function MembersPage() {
       cell: (row) => (
         <ActionMenu 
           items={[
-            { id: "view", label: "View Profile", icon: UserIcon },
-            { id: "edit", label: "Edit Member", icon: SettingsIcon },
+            { id: "view", label: "View Profile", icon: User },
+            { id: "edit", label: "Edit Member", icon: Settings },
             { id: "enroll", label: "Enroll Biometrics", icon: Fingerprint },
             { id: "push", label: "Sync to Machine", icon: Cpu },
-            { id: "delete", label: "Delete", icon: Delete01Icon, variant: "destructive" },
+            { id: "delete", label: "Delete", icon: Trash2, variant: "destructive" },
           ]} 
           onAction={(id) => {
             if (id === "delete") handleDelete(row._id || row.id, row.user?.name)

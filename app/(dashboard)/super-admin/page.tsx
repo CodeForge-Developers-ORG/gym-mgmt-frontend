@@ -5,15 +5,11 @@ import Link from "next/link"
 import {
   Building2, CreditCard, Users, Activity, TrendingUp,
   ArrowUpRight, ArrowDownRight, MoreHorizontal, ExternalLink,
-  RefreshCw, Globe, CheckCircle2, AlertCircle, Clock
+  RefreshCw, Globe, CheckCircle2, AlertCircle, Clock,
+  Trash2, EyeOff, Link2, CheckCircle
 } from "lucide-react"
 import { ActionMenu, type ActionMenuItem } from "@/components/ui/action-menu"
-import { 
-  Delete01Icon, 
-  ViewOffIcon, 
-  Link01Icon,
-  CheckmarkCircle01Icon
-} from "@hugeicons/core-free-icons"
+
 import { useToast } from "@/context/toast-context"
 import { ConfirmModal } from "@/components/ui/confirm-modal"
 import {
@@ -535,13 +531,13 @@ export default function SuperAdminDashboard() {
                     <td className="px-5 py-3.5">
                       <ActionMenu 
                         items={[
-                          { id: "map", label: "Map Subscriptions", icon: Link01Icon },
+                          { id: "map", label: "Map Subscriptions", icon: Link2 },
                           { 
                             id: "toggle-status", 
                             label: gym.status === "Active" ? "Mark Inactive" : "Mark Active", 
-                            icon: gym.status === "Active" ? ViewOffIcon : CheckmarkCircle01Icon 
+                            icon: gym.status === "Active" ? EyeOff : CheckCircle 
                           },
-                          { id: "delete", label: "Delete Gym", icon: Delete01Icon, variant: "destructive" },
+                          { id: "delete", label: "Delete Gym", icon: Trash2, variant: "destructive" },
                         ]} 
                         onAction={(id) => handleAction(String(gym._id || gym.id), id)} 
                       />

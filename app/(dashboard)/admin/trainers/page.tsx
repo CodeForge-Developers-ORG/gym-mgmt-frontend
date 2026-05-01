@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, UserPlus, RefreshCw, Star, Trash2, Edit } from "lucide-react"
+import { Plus, UserPlus, RefreshCw, Star, Trash2, Edit, Settings, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DataTable, type Column } from "@/components/tables/data-table"
 import { Badge } from "@/components/ui/badge"
@@ -15,7 +15,7 @@ import { getInitials, cn } from "@/lib/utils"
 import { SlideInText } from "@/components/ui/slide-in-text"
 import { useToast } from "@/context/toast-context"
 import { ActionMenu } from "@/components/ui/action-menu"
-import { Delete01Icon, SettingsIcon, UserIcon } from "@hugeicons/core-free-icons"
+
 import { ConfirmModal } from "@/components/ui/confirm-modal"
 
 export default function TrainersPage() {
@@ -147,9 +147,9 @@ export default function TrainersPage() {
       cell: (row) => (
         <ActionMenu 
           items={[
-            { id: "view", label: "View Profile", icon: UserIcon },
-            { id: "edit", label: "Edit Details", icon: SettingsIcon },
-            { id: "delete", label: "Remove", icon: Delete01Icon, variant: "destructive" },
+            { id: "view", label: "View Profile", icon: User },
+            { id: "edit", label: "Edit Details", icon: Settings },
+            { id: "delete", label: "Remove", icon: Trash2, variant: "destructive" },
           ]} 
           onAction={(id) => {
             if (id === "delete") handleDelete(row._id || row.id, row.user?.name)
